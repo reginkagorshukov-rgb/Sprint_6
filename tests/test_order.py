@@ -1,14 +1,14 @@
 import allure
 import pytest
 from ..user_data import UserData
-from ..pages.order_page import Order
+from ..pages.order_page import Orders
 
 @allure.feature("Заказы")
 class TestOrder:
     @allure.title("Проверка верхней кнопки Заказать")
     @pytest.mark.parametrize("user_data", [UserData.USER1])
     def test_order_top(self, driver, user_data):
-        order1 = Order(driver)
+        order1 = Orders(driver)
         order1.click_cookie()
         order1.click_order_top()
         
@@ -25,7 +25,7 @@ class TestOrder:
     @allure.title("Проверка нижней кнопки Заказать")
     @pytest.mark.parametrize("user_data", [UserData.USER2])
     def test_order_bottom(self, driver, user_data):
-        order2 = Order(driver)
+        order2 = Orders(driver)
         order2.click_cookie()
         order2.click_order_bottom()
 

@@ -1,77 +1,73 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.wait import WebDriverWait
-import allure
-import time
+from .base_page import BasePage
 from ..locators.cookie_locators import Cookie
 from ..locators.order_locators import Order
-
-class Order:
-    TOP_ORDER_BUTTON = Order.TOP_ORDER_BUTTON
-    BOTTOM_ORDER_BUTTON = Order.BOTTOM_ORDER_BUTTON
-    COOKIE = Cookie.COOKIE
-    NAME_INPUT = Order.NAME_INPUT
-    SURNAME_INPUT = Order.SURNAME_INPUT
-    ADDRESS_INPUT = Order.ADDRESS_INPUT
-    METRO_INPUT = Order.METRO_INPUT
-    TELEPHON_INPUT = Order.TELEPHON_INPUT
-    NEXT_BUTTON = Order.NEXT_BUTTON
-    DROPDOWN_METRO = Order.DROPDOWN_METRO
-    DELIVERY_DATE = Order.DELIVERY_DATE
-    RENTAL_PERIOD = Order.RENTAL_PERIOD
-    DROPDOWN_RENTAL_PERIOD = Order.DROPDOWN_RENTAL_PERIOD
-    COMMENT_INPUT = Order.COMMENT_INPUT
-    FORMA_ORDER_BUTTON = Order.FORMA_ORDER_BUTTON
-    YES_BUTTON = Order.YES_BUTTON
-    ORDER_DECORATED = Order.ORDER_DECORATED
-    STATUS_BUTTON = Order.STATUS_BUTTON
-    SCOOTER_LOGO = Order.SCOOTER_LOGO
-    YANDEX_LOGO = Order.YANDEX_LOGO
+import allure
 
 
+class Orders(BasePage):
     def __init__(self, driver):
-        self.driver = driver
-        self.wait = WebDriverWait(driver, 20)
+        super().__init__(driver)
+        self.top_order_button = Order.TOP_ORDER_BUTTON
+        self.bottom_order_button = Order.BOTTOM_ORDER_BUTTON
+        self.cookie_button = Cookie.COOKIE
+        self.name_input = Order.NAME_INPUT
+        self.surname_input = Order.SURNAME_INPUT
+        self.address_input = Order.ADDRESS_INPUT
+        self.metro_input = Order.METRO_INPUT
+        self.telephon_input = Order.TELEPHON_INPUT
+        self.next_button = Order.NEXT_BUTTON
+        self.dropdown_metro = Order.DROPDOWN_METRO
+        self.delivery_date = Order.DELIVERY_DATE
+        self.rental_period = Order.RENTAL_PERIOD
+        self.comment_input = Order.COMMENT_INPUT
+        self.forma_order_button = Order.FORMA_ORDER_BUTTON
+        self.yes_button = Order.YES_BUTTON
+        self.order_decorated_locator = Order.ORDER_DECORATED
+        self.status_button = Order.STATUS_BUTTON
+        self.scooter_logo = Order.SCOOTER_LOGO
+        self.yandex_logo = Order.YANDEX_LOGO
 
     @allure.step("Принять куки")
     def click_cookie(self):
-        self.driver.find_element(*self.COOKIE).click()
+        self.click(self.cookie_button)
 
     @allure.step("Нажать верхнюю кнопку 'Заказать'")
     def click_order_top(self):
-        self.driver.find_element(*self.TOP_ORDER_BUTTON).click()
+        self.click(self.top_order_button)
 
     @allure.step("Нажать нижнюю кнопку 'Заказать'")
     def click_order_bottom(self):
-        self.driver.find_element(*self.BOTTOM_ORDER_BUTTON).click()
+        self.click(self.bottom_order_button)
 
     @allure.step("Заполнить поле 'Имя'")
     def set_name(self, name):
-        self.driver.find_element(*self.NAME_INPUT).send_keys(name)
+        self.send_keys(self.name_input, name)
 
     @allure.step("Заполнить поле 'Фамилия'")
     def set_surname(self, surname):
-        self.driver.find_element(*self.SURNAME_INPUT).send_keys(surname)
+        self.send_keys(self.surname_input, surname)
 
     @allure.step("Заполнить поле 'Адрес'")
     def set_address(self, address):
-        self.driver.find_element(*self.ADDRESS_INPUT).send_keys(address)
-    
+        self.send_keys(self.address_input, address)
+
     @allure.step("Заполнить поле 'Станция метро'")
     def set_metro(self, metro):
-        self.driver.find_element(*self.METRO_INPUT).click()
-        self.driver.find_element(*self.METRO_INPUT).send_keys(metro)
-        self.driver.find_element(*self.DROPDOWN_METRO).click()
+        self.click(self.metro_input)
+        self.send_keys(self.metro_input, metro)
+        self.wait.until(EC.presence_of_element_located(self.dropdown_metro))
+        self.click(self.dropdown_metro)
 
     @allure.step("Заполнить поле 'Телефон'")
     def set_telephon(self, telephon):
-        self.driver.find_element(*self.TELEPHON_INPUT).send_keys(telephon)
+        self.send_keys(self.telephon_input, telephon)
 
     @allure.step("Нажать на кнопку 'Далее'")
     def click_next(self):
-        self.driver.find_element(*self.NEXT_BUTTON).click()
+        self.click(self.next_button)
 
-    
     def forma_order1(self, name, surname, address, metro, telephon):
         self.set_name(name)
         self.set_surname(surname)
@@ -79,32 +75,31 @@ class Order:
         self.set_metro(metro)
         self.set_telephon(telephon)
         self.click_next()
-        self.wait.until(EC.presence_of_element_located(self.DELIVERY_DATE))
+        self.wait.until(EC.presence_of_element_located(self.delivery_date))
 
-    @allure.step("Заполнить поле 'Когда привезт самокат'")
+    @allure.step("Заполнить поле 'Когда привезти самокат'")
     def set_delivery(self, delivery):
-        self.driver.find_element(*self.DELIVERY_DATE).send_keys(delivery)
-        self.driver.find_element(*self.DELIVERY_DATE).send_keys('\n')
-        self.driver.find_element(By.TAG_NAME, 'body').click()
+        self.send_keys(self.delivery_date, delivery)
+        self.wait.until(EC.text_to_be_present_in_element_value(self.delivery_date, delivery))
+        self.click((By.TAG_NAME, 'body'))
 
     @allure.step("Заполнить поле 'Срок аренды'")
     def set_period(self, period):
-        self.driver.find_element(*self.RENTAL_PERIOD).click()
-        time.sleep(0.5)
-        self.driver.find_element(*period).click()
+        self.click(self.rental_period)
+        self.wait.until(EC.presence_of_element_located(period))
+        self.click(period)
 
     @allure.step("Заполнить поле 'Комментарий'")
     def set_comment(self, comment):
-        self.driver.find_element(*self.COMMENT_INPUT).send_keys(comment)
-    
+        self.send_keys(self.comment_input, comment)
+
     @allure.step("Заполнить поле 'Цвет самоката'")
     def set_color(self, color):
-        self.driver.find_element(*color).click()
+        self.click(color)
 
     @allure.step("Нажать кнопку 'Заказать'")
     def click_order_forma(self):
-        self.driver.find_element(*self.FORMA_ORDER_BUTTON).click()
-
+        self.click(self.forma_order_button)
 
     def forma_order2(self, delivery, period, color, comment):
         self.set_delivery(delivery)
@@ -115,19 +110,22 @@ class Order:
 
     @allure.step("Нажать кнопку 'Да'")
     def click_yes(self):
-        self.driver.find_element(*self.YES_BUTTON).click()
+        self.click(self.yes_button)
 
     def order_decorated(self):
-        return self.wait.until(EC.visibility_of_element_located(self.ORDER_DECORATED)).is_displayed()
+        return self.is_displayed(self.order_decorated_locator)
+
     def order_decorated1(self):
-        return self.wait.until(EC.visibility_of_element_located(self.ORDER_DECORATED)) is not None
- 
+        return self.find_element(self.order_decorated_locator) is not None
+
+    @allure.step("Нажать кнопку 'Посмотреть статус'")
     def click_status(self):
-        self.driver.find_element(*self.STATUS_BUTTON).click()
-    
-    @allure.step("Нажать логип самокат")
+        self.click(self.status_button)
+
+    @allure.step("Нажать логотип Самокат")
     def click_scooter(self):
-        self.driver.find_element(*self.SCOOTER_LOGO).click()
-    @allure.step("Нажать логип яндекс")
+        self.click(self.scooter_logo)
+
+    @allure.step("Нажать логотип Яндекс")
     def click_yandex(self):
-        self.driver.find_element(*self.YANDEX_LOGO).click()
+        self.click(self.yandex_logo)
