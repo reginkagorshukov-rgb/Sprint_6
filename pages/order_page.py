@@ -1,4 +1,3 @@
-from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from .base_page import BasePage
 from ..locators.cookie_locators import Cookie
@@ -28,6 +27,7 @@ class Orders(BasePage):
         self.status_button = Order.STATUS_BUTTON
         self.scooter_logo = Order.SCOOTER_LOGO
         self.yandex_logo = Order.YANDEX_LOGO
+        self.body = Order.BODY
 
     @allure.step("Принять куки")
     def click_cookie(self):
@@ -81,7 +81,7 @@ class Orders(BasePage):
     def set_delivery(self, delivery):
         self.send_keys(self.delivery_date, delivery)
         self.wait.until(EC.text_to_be_present_in_element_value(self.delivery_date, delivery))
-        self.click((By.TAG_NAME, 'body'))
+        self.click(self.body)
 
     @allure.step("Заполнить поле 'Срок аренды'")
     def set_period(self, period):
@@ -115,9 +115,6 @@ class Orders(BasePage):
     def order_decorated(self):
         return self.is_displayed(self.order_decorated_locator)
 
-    def order_decorated1(self):
-        return self.find_element(self.order_decorated_locator) is not None
-
     @allure.step("Нажать кнопку 'Посмотреть статус'")
     def click_status(self):
         self.click(self.status_button)
@@ -129,3 +126,33 @@ class Orders(BasePage):
     @allure.step("Нажать логотип Яндекс")
     def click_yandex(self):
         self.click(self.yandex_logo)
+
+    @allure.step("Получить текущий URL")
+    def get_current_url(self):
+        return self.driver.current_url
+    
+    @allure.step("Ожидать открытия новой вкладки")
+    def wait_for_new_tab(self, expected_number_of_windows=2):
+        self.wait.until(EC.number_of_windows_to_be(expected_number_of_windows))
+
+    @allure.step("Переключиться на новую вкладку")
+    def switch_to_new_tab(self):
+        self.driver.switch_to.window(self.driver.window_handles[-1])
+
+    @allure.step("Переключиться на вкладку по индексу")
+    def switch_to_tab_by_index(self, index=-1):
+        self.driver.switch_to.window(self.driver.window_handles[index])
+    
+    @allure.step("Ожидать загрузки страницы")
+    def wait_for_page_load(self):
+        self.wait.until(lambda driver: driver.execute_script("return document.readyState") == "complete")
+
+    @allure.step("Кликнуть на логотип Яндекс и переключиться на новую вкладку")
+    def click_yandex_and_switch_to_new_tab(self):
+        initial_tabs = len(self.driver.window_handles)
+        self.click_yandex()
+        self.wait.until(lambda driver: len(driver.window_handles) > initial_tabs)
+        self.wait_for_new_tab()
+        self.switch_to_new_tab()
+        self.wait_for_page_load()
+        self.wait.until(lambda driver: driver.current_url != "about:blank")

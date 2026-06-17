@@ -30,3 +30,4 @@ class Order:
     STATUS_BUTTON = (By.XPATH, "//button[@class='Button_Button__ra12g Button_Middle__1CSJM' and text()='Посмотреть статус']")
     SCOOTER_LOGO = (By.XPATH, "//img[@alt='Scooter']")
     YANDEX_LOGO = (By.XPATH, "//img[@alt='Yandex']")
+    BODY = (By.TAG_NAME, 'body')

@@ -65,3 +65,7 @@ class BasePage:
     def click_when_ready(self, locator):
         element = self.wait.until(EC.element_to_be_clickable(locator))
         element.click()
+
+    @allure.step("Ожидать загрузки страницы")
+    def wait_for_page_load(self, timeout=20):
+        self.wait.until(lambda driver: driver.execute_script("return document.readyState") == "complete")
